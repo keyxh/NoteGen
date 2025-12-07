@@ -1,0 +1,14 @@
+{
+    "host": "127.0.0.1",
+    "port": 5000,
+    "debug": false,
+    "auto_save": true,
+    "auto_save_interval": 30,
+    "theme": "light",
+    "font_size": 14,
+    "tab_size": 4,
+    "word_wrap": true,
+    "preview_theme": "github",
+    "sync_scroll": true,
+    "highlight_code": true
+}

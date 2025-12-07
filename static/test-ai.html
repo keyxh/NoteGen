@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .test-button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI功能测试页面</h1>
+    
+    <div class="test-section">
+        <h2>1. API连接测试</h2>
+        <button class="test-button" onclick="testAPIConnection()">测试API连接</button>
+        <div id="api-connection-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. AI对话测试</h2>
+        <input type="text" id="chat-message" placeholder="输入测试消息" style="width: 70%; padding: 8px;">
+        <button class="test-button" onclick="testAIChat()">发送对话</button>
+        <div id="ai-chat-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. AI编辑测试</h2>
+        <textarea id="edit-content" placeholder="输入要编辑的内容" style="width: 70%; height: 100px; padding: 8px;"># 测试文档
+
+这是一个测试文档。
+
+## 内容
+
+这里有一些内容。</textarea>
+        <br><br>
+        <input type="text" id="edit-instruction" placeholder="输入编辑指令" style="width: 70%; padding: 8px;">
+        <button class="test-button" onclick="testAIEdit()">发送编辑</button>
+        <div id="ai-edit-result" class="result"></div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/ai-assistant.js') }}"></script>
+    <script>
+        // 创建AI助手实例用于测试
+        let aiAssistant;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 创建一个模拟的应用对象
+            const mockApp = {
+                editor: {
+                    getValue: () => ''
+                },
+                showMessage: (message, type) => {
+                    console.log(`[${type}] ${message}`);
+                }
+            };
+            
+            // 创建AI助手实例
+            aiAssistant = new AIAssistant(mockApp);
+        });
+        
+        // 测试API连接
+        async function testAPIConnection() {
+            const resultDiv = document.getElementById('api-connection-result');
+            resultDiv.textContent = '测试中...';
+            
+            const result = await aiAssistant.testAPIConnection();
+            
+            if (result.success) {
+                resultDiv.textContent = result.message + '\n' + JSON.stringify(result.data, null, 2);
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = result.message + ': ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        // 测试AI对话
+        async function testAIChat() {
+            const message = document.getElementById('chat-message').value;
+            const resultDiv = document.getElementById('ai-chat-result');
+            
+            if (!message) {
+                resultDiv.textContent = '请输入测试消息';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = '发送中...';
+            
+            const result = await aiAssistant.testAIChat(message);
+            
+            if (result.success) {
+                resultDiv.textContent = 'AI回复：\n' + result.response;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = result.message + ': ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        // 测试AI编辑
+        async function testAIEdit() {
+            const content = document.getElementById('edit-content').value;
+            const instruction = document.getElementById('edit-instruction').value;
+            const resultDiv = document.getElementById('ai-edit-result');
+            
+            if (!instruction) {
+                resultDiv.textContent = '请输入编辑指令';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            resultDiv.textContent = '发送中...';
+            
+            const result = await aiAssistant.testAIEdit(instruction, content);
+            
+            if (result.success) {
+                resultDiv.textContent = 'AI编辑结果：\n' + result.response;
+                resultDiv.className = 'result success';
+            } else {
+                resultDiv.textContent = result.message + ': ' + result.error;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>
